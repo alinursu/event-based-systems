@@ -30,8 +30,21 @@ class Publication:
                (str(self.stationid), self.city, str(self.temp), str(self.rain), str(self.wind), self.direction,
                 str(self.date))
 
-    def to_csv_row(self) -> list:
-        return [
-            str(self.stationid), self.city, str(self.temp), str(self.rain), str(self.wind), self.direction,
-            str(self.date)
+    def to_row(self) -> list:
+        values: [str] = [
+            f"(stationid, {self.stationid})",
+            f"(city, \"{self.city}\")",
+            f"(temp, {self.temp})",
+            f"(rain, {self.rain})"
+            f"(wind, {self.wind})",
+            f"(direction, \"{self.direction}\")",
+            f"(date, {self.date})"
         ]
+
+        text = ""
+        for i in range(0, len(values) - 1):
+            text += values[i] + ";"
+
+        text += values[len(values) - 1]
+
+        return "{" + text + "}"
