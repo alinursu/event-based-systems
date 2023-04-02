@@ -2,9 +2,8 @@ import math
 import random
 
 from src.Subscription import Subscription
-from src.config import freq_dict as freq_dict_config, number_of_subs, possible_values
-
-freq_dict = freq_dict_config
+from src.config import freq_dict as freq_dict_config, possible_values
+from src.utils import copy_dict
 
 
 def is_valid_freq(freq_value: int) -> bool:
@@ -18,13 +17,13 @@ def is_valid_freq(freq_value: int) -> bool:
     return freq_value is not None and type(freq_value) == int and freq_value >= 0
 
 
-def check_freq_dict_params():
+def check_freq_dict_params(freq_dict: dict):
     """
     Verifica daca parametrii din freq_dict sunt valizi. Daca sunt valizi (nu sunt None, sunt de tipul int si au valori
     pozitive), ii pastreaza; altfel, li se va seta valoarea 0.
-    """
 
-    global freq_dict
+    :param freq_dict: Dictionarul cu frecventele campurilor.
+    """
 
     freq_dict = {
         'city': freq_dict['city'] if is_valid_freq(freq_dict['city']) else 0,
@@ -42,14 +41,15 @@ def check_freq_dict_params():
     }
 
 
-def normalize_frequency_dict():
+def normalize_frequency_dict(number_of_subs: int, freq_dict: dict):
     """
     Normalizeaza valorile dictionarului cu frecvente prin transformarea frecventelor din procente in numarul exact
     de subscriptii (de exemplu: daca totalul subscriptiilor este 10000, iar frecventa campului "city" este de 30%,
     atunci 30*10000/100 = 3000 de subscriptii vor avea acel camp).
-    """
 
-    global freq_dict
+    :param freq_dict: Dictionarul cu frecventele campurilor.
+    :param number_of_subs: Numarul de subscriptii care vor fi generate
+    """
 
     # Normalizam fiecare frecventa
     for key, value in freq_dict.items():
@@ -62,14 +62,13 @@ def normalize_frequency_dict():
     freq_dict['wind_operator'] = round(freq_dict['wind_operator'] * freq_dict['wind'] / number_of_subs)
 
 
-def generate_sub_with_city():
+def generate_sub_with_city(freq_dict: dict):
     """
     Genereaza o subscriptie care va avea valoare doar pe campul "city".
 
+    :param freq_dict: Dictionarul cu frecventele campurilor.
     :return: Subscriptia generata.
     """
-
-    global freq_dict
 
     city = random.choice(possible_values['city'])
 
@@ -81,14 +80,13 @@ def generate_sub_with_city():
     return Subscription(city=city, city_operator=city_operator)
 
 
-def generate_sub_with_temp():
+def generate_sub_with_temp(freq_dict: dict):
     """
     Genereaza o subscriptie care va avea valoare doar pe campul "temp".
 
+    :param freq_dict: Dictionarul cu frecventele campurilor.
     :return: Subscriptia generata.
     """
-
-    global freq_dict
 
     temp = random.randint(possible_values['temp']['min'], possible_values['temp']['max'])
 
@@ -100,14 +98,13 @@ def generate_sub_with_temp():
     return Subscription(temp=temp, temp_operator=temp_operator)
 
 
-def generate_sub_with_rain():
+def generate_sub_with_rain(freq_dict: dict):
     """
     Genereaza o subscriptie care va avea valoare doar pe campul "rain".
 
+    :param freq_dict: Dictionarul cu frecventele campurilor.
     :return: Subscriptia generata.
     """
-
-    global freq_dict
 
     rain = round(random.uniform(possible_values['rain']['min'], possible_values['rain']['max']), 2)
 
@@ -119,14 +116,13 @@ def generate_sub_with_rain():
     return Subscription(rain=rain, rain_operator=rain_operator)
 
 
-def generate_sub_with_wind():
+def generate_sub_with_wind(freq_dict: dict):
     """
     Genereaza o subscriptie care va avea valoare doar pe campul "wind".
 
+    :param freq_dict: Dictionarul cu frecventele campurilor.
     :return: Subscriptia generata.
     """
-
-    global freq_dict
 
     wind = random.randint(possible_values['wind']['min'], possible_values['wind']['max'])
 
@@ -139,7 +135,8 @@ def generate_sub_with_wind():
 
 
 def normalize_subs_to_match_set_total_number(subs_with_city: [Subscription], subs_with_temp: [Subscription],
-                                             subs_with_rain: [Subscription], subs_with_wind: [Subscription]) \
+                                             subs_with_rain: [Subscription], subs_with_wind: [Subscription],
+                                             number_of_subs: int, freq_dict: dict) \
         -> [Subscription]:
     """
     Normalizeaza subscriptiile generate astfel incat numarul total va fi egal cu numarul total setat in
@@ -156,8 +153,11 @@ def normalize_subs_to_match_set_total_number(subs_with_city: [Subscription], sub
     :param subs_with_temp: Lista cu subscriptii care au setate campul "temp".
     :param subs_with_rain: Lista cu subscriptii care au setate campul "rain".
     :param subs_with_wind: Lista cu subscriptii care au setate campul "wind".
+    :param number_of_subs: Numarul total de subscriptii care (ar trebui) sa fi fost generate.
+    :param freq_dict: Dictionarul cu frecventele campurilor.
     :return: Lista agregata de subscriptii.
     """
+
     total_generated_subs = len(subs_with_city) + len(subs_with_temp) + len(subs_with_rain) + len(subs_with_wind)
     if total_generated_subs > number_of_subs:
         # Daca numarul total de subscriptii generate depaseste numarul setat de subscriptii, atunci trebuie sa
@@ -204,14 +204,23 @@ def normalize_subs_to_match_set_total_number(subs_with_city: [Subscription], sub
         subs.extend(subs_with_wind)
 
         # Combinarea subscriptiilor
-        for sub in extra_subs:
+        for index, sub in enumerate(extra_subs):
+            left_extra_subs = len(extra_subs) - index
+            total_subs_if_all_extra_subs_would_be_uncombined = len(subs) + left_extra_subs
+
+            if total_subs_if_all_extra_subs_would_be_uncombined == number_of_subs:
+                # Daca numarul total de subscriptii actuale (din toate listele) este egal cu numarul tinta de
+                # subscriptii, opresc procesul de combinare
+                subs.extend(extra_subs[index:])
+                break
+
             # Aleg o subscriptie in care voi insera datele
             sub_to_insert_into = None
             while sub_to_insert_into is None:
                 sub_to_insert_into = random.choice(subs)
 
                 if (sub.city is not None and sub_to_insert_into.city is not None) or \
-                    (sub.temp is not None and sub_to_insert_into.temp is not None) or \
+                        (sub.temp is not None and sub_to_insert_into.temp is not None) or \
                         (sub.rain is not None and sub_to_insert_into.rain is not None) or \
                         (sub.wind is not None and sub_to_insert_into.wind is not None):
                     # Cazul in care as suprascrie valoarea din subscriptie
@@ -244,33 +253,34 @@ def normalize_subs_to_match_set_total_number(subs_with_city: [Subscription], sub
         return subs
 
 
-def generate_subs() -> [Subscription]:
+def generate_subs(number_of_subs: int) -> [Subscription]:
     """
     Genereaza o lista de subscriptii in functie de parametrii setati in src.config.freq_dict.
 
+    :param number_of_subs: Numarul de subscriptii care vor fi generate.
     :return: Lista de subscriptii generata.
     """
 
-    global freq_dict
+    freq_dict = copy_dict(freq_dict_config)
 
     # Verificam parametrii din freq_dict
-    check_freq_dict_params()
+    check_freq_dict_params(freq_dict)
 
     # Normalizam valorile din freq_dict
-    normalize_frequency_dict()
+    normalize_frequency_dict(number_of_subs, freq_dict)
 
     # Afisarea dictionarului de frecvente
-    print(freq_dict)
+    # print(freq_dict)
 
     # Generarea subscriptiilor
-    subs_with_city: [Subscription] = [generate_sub_with_city() for i in range(0, freq_dict['city'])]
-    subs_with_temp: [Subscription] = [generate_sub_with_temp() for i in range(0, freq_dict['temp'])]
-    subs_with_rain: [Subscription] = [generate_sub_with_rain() for i in range(0, freq_dict['rain'])]
-    subs_with_wind: [Subscription] = [generate_sub_with_wind() for i in range(0, freq_dict['wind'])]
+    subs_with_city: [Subscription] = [generate_sub_with_city(freq_dict) for i in range(0, freq_dict['city'])]
+    subs_with_temp: [Subscription] = [generate_sub_with_temp(freq_dict) for i in range(0, freq_dict['temp'])]
+    subs_with_rain: [Subscription] = [generate_sub_with_rain(freq_dict) for i in range(0, freq_dict['rain'])]
+    subs_with_wind: [Subscription] = [generate_sub_with_wind(freq_dict) for i in range(0, freq_dict['wind'])]
 
     # Intercalarea subscriptiilor (daca suma frecventelor initiale ale campurilor este > 100)
     subs = normalize_subs_to_match_set_total_number(
-        subs_with_city, subs_with_temp, subs_with_rain, subs_with_wind
+        subs_with_city, subs_with_temp, subs_with_rain, subs_with_wind, number_of_subs, freq_dict
     )
 
     return subs
