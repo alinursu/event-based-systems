@@ -88,7 +88,7 @@ def generate_sub_with_temp(freq_dict: dict):
     :return: Subscriptia generata.
     """
 
-    temp = random.randint(possible_values['temp']['min'], possible_values['temp']['max'])
+    temp = round(random.uniform(possible_values['temp']['min'], possible_values['temp']['max']))
 
     temp_operator = None
     if freq_dict['temp_operator'] > 0:
@@ -124,7 +124,7 @@ def generate_sub_with_wind(freq_dict: dict):
     :return: Subscriptia generata.
     """
 
-    wind = random.randint(possible_values['wind']['min'], possible_values['wind']['max'])
+    wind = round(random.uniform(possible_values['wind']['min'], possible_values['wind']['max']))
 
     wind_operator = None
     if freq_dict['wind_operator'] > 0:
