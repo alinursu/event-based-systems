@@ -50,10 +50,11 @@ subscriptii pe care trebuie sa le genereze.
 Odata normalizat dictionarul cu frecvente, va genera toate subscriptiile cu campul `city`, toate cu campul `temp`,
 toate cu campul `rain` si toate cu campul `wind` (impreuna cu operatorii acestora daca sunt specificati in dictionar).
 
+Se va face apoi normalizarea subscriptiilor generate asa incat numarul total sa fie egal cu cet setat in config.
 In cazul in care suma procentuala a frecventelor campurilor depaseste 100% (adica dintre subscriptiile generate cateva vor
 trebui sa aiba valori pentru mai multe campuri), va determina cate subscriptii sunt in plus, le va extrage din liste si
 va continua cu "combinarea subscriptiilor". O posibila combinare, de exemplu, se poate realiza intre subscriptia
-`{(city, "Iasi")}` si subscriptia `{(rain, 0.76)}`, rezultand o noua subscriptie: `{(city, "Iasi"), (rain, 0.76)}`.
+`{(city, "Iasi")}` si subscriptia `{(rain, 0.76)}`, rezultand o noua subscriptie: `{(city, "Iasi"), (rain, 0.76)}`. Acest proces de combinare a subscriptiilor se va opri cand numarul total de subscriptii actuale va fi egal cu cel dorit.
 
 La final publicatiile vor fi scrise in fisierul `publicatii.txt`, iar subscriptiile vor fi scrise in fisierul `subscriptii.txt`.
 In cazul in care factorul de paralelizare este > 1 (adica se folosesc mai multe thread-uri la generarea datelor),
