@@ -1,4 +1,6 @@
+import datetime
 import threading
+import time
 
 from src.Publication import Publication
 from src.Subscription import Subscription
@@ -58,6 +60,9 @@ if sum(number_of_subs_thread_parameters) != number_of_subs:
     number_of_subs_thread_parameters[-1] = number_of_subs - sum(number_of_subs_thread_parameters[:-1])
 
 # Pornesc thread-urile
+start_time = datetime.datetime.now()
+
+threads = []
 for i in range(0, number_of_threads):
     name = f"Thread {i+1}"
 
@@ -66,3 +71,12 @@ for i in range(0, number_of_threads):
         args=(name, number_of_pubs_thread_parameters[i], number_of_subs_thread_parameters[i])
     )
     t.start()
+
+    threads.append(t)
+
+while any(t.is_alive() for t in threads):
+    time.sleep(0.2)
+
+stop_time = datetime.datetime.now()
+
+print(f"Duration: {stop_time.timestamp() - start_time.timestamp()}")

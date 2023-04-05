@@ -1,11 +1,11 @@
 import datetime
 
 # Numarul de publicatii & subscriptii care vor fi generate
-number_of_pubs = 10000
-number_of_subs = 10000
+number_of_pubs = 100000
+number_of_subs = 100000
 
 # Numarul de thread-uri care vor fi folosite pentru generarea datelor
-number_of_threads = 2
+number_of_threads = 4
 
 # Valori posibile pentru fiecare camp
 possible_values = {
