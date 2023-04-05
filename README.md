@@ -41,11 +41,11 @@ se va folosi o distributie uniforma de la valoarea minima pana la valoarea maxim
 iar pentru campurile de tip text (city, direction, date) se va alege la intamplare o valoare din lista pre-definita
 de valori posibile.
 
-Pentru generarea subscriptiilor, fiecare thread va valida intai dictionarul de frecvente si va corecta pe alocuri micile
-inconsistente (de exemplu, valoarea `None` va fi transformata in `0`). Dupa corectare, thread-ul va normaliza valorile din
-dictionarul de frecvente: la acest punct, dictionarul contine valori procentuale (de la 0 la 100), iar thread-uri va
-transforma aceste procente in numarul efectiv de entitati in functie de procente si de numarul asignat de subscriptii pe care
-trebuie sa le genereze.
+Pentru generarea subscriptiilor, fiecare thread va valida intai dictionarul de frecvente (este de tipul int si are valori pozitive) 
+si va corecta pe alocuri micile inconsistente (de exemplu, valoarea `None` va fi transformata in `0`). Dupa corectare, thread-ul va normaliza 
+valorile din dictionarul de frecvente (atat pentru campuri, cat si pentru operatori): la acest punct, dictionarul contine valori procentuale 
+(de la 0 la 100), iar thread-uri va transforma aceste procente in numarul efectiv de entitati in functie de procente si de numarul asignat de
+subscriptii pe care trebuie sa le genereze.
 
 Odata normalizat dictionarul cu frecvente, va genera toate subscriptiile cu campul `city`, toate cu campul `temp`,
 toate cu campul `rain` si toate cu campul `wind` (impreuna cu operatorii acestora daca sunt specificati in dictionar).
