@@ -28,7 +28,7 @@ def acquire_file_lock(file: str):
     lock_file_path = os.path.join(os.getcwd(), f"{file}.lock")
 
     while os.path.exists(lock_file_path):
-        time.sleep(0.5)
+        time.sleep(0.25)
 
     open(lock_file_path, 'w').close()
 
